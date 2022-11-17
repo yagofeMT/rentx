@@ -16,11 +16,12 @@ module.exports = function (api) {
             '@theme': './src/theme',
             '@utils': './src/utils',
             '@services': './src/services',
-            '@hooks': './src/hooks'
+            '@hooks': './src/hooks',
+            '@databases': './src/databases'
           }
         }
       ],
-      ['react-native-reanimated/plugin'],
+      'react-native-reanimated/plugin',
       ["@babel/plugin-proposal-decorators", { "legacy": true }]
     ],
   };

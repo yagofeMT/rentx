@@ -1,62 +1,92 @@
-import api from '@services/api';
-import React, { createContext, useState, useContext, ReactNode } from 'react'
-import { Alert } from 'react-native';
-
+import { database } from "@databases/index";
+import api from "@services/api";
+import React, { createContext, useState, useContext, ReactNode, useEffect } from "react";
+import { Alert } from "react-native";
+import {User as UserModel} from '@databases/model/User';
 
 interface User {
-    id: string;
-    email: string;
-    name: string;
-    driver_license: string;
-    avatar: string;
-}
+  id: string;
+  user_id: string;
+  email: string;
+  name: string;
+  driver_license: string;
+  avatar: string;
+  token: string;
 
-interface AuthState {
-    token: string;
-    user: User;
 }
 
 interface SignInCredentials {
-    email: string;
-    password: string
+  email: string;
+  password: string;
 }
 
 interface AuthContextData {
-    user: User;
-    signIn: (credentials: SignInCredentials) => Promise<void>;
+  user: User;
+  signIn: (credentials: SignInCredentials) => Promise<void>;
 }
 
 interface AuthProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
-
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 function AuthProvider({ children }: AuthProviderProps) {
+  const [data, setData] = useState<User>({} as User);
 
-    const [data, setData] = useState<AuthState>({} as AuthState)
+  async function signIn({ email, password }: SignInCredentials) {
+    try {
+      const response = await api.post("/sessions", { email, password });
 
-    async function signIn({ email, password }: SignInCredentials) {
-        await api.post('/sessions', { email, password }).then((response) => setData(response.data)).catch((error) => Alert.alert('Opa', 'Usuário não encontrado'))
+      const { token, user } = response.data;
+      api.defaults.headers.authorization = `Bearer ${data.token}`;
 
-        api.defaults.headers.authorization = `Bearer ${data.token}`;
+      const userColletions = database.get<UserModel>("users");
 
-        console.log(data);
-        
+      await database.write(async () => {
+        await userColletions.create((newUser) => {
+            newUser.user_id = user.id,
+            newUser.name = user.name,
+            newUser.email = user.email,
+            newUser.driver_license = user.driver_license,
+            newUser.avatar = user.avatar,
+            newUser.token = token
+        });
+      });
+
+      setData({ ...user, token });
+    } catch(error) {
+      throw new Error();
+    }
+  }
+
+  useEffect(() => {
+    async function loadUserData() {
+        const userColletions = database.get<UserModel>('users');
+        const response = await userColletions.query().fetch();
+
+        if(response.length > 0)
+        {
+            const userData = response[0]._raw as unknown as User;
+            api.defaults.headers.authorization = `Bearer ${userData.token}`;
+            setData(userData);
+        }
     }
 
-    return (
-        <AuthContext.Provider value={{ user: data.user, signIn }}>
-            {children}
-        </AuthContext.Provider>
-    )
+    loadUserData()
+  })
+
+  return (
+    <AuthContext.Provider value={{ user: data, signIn }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 function useAuth(): AuthContextData {
-    const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
 
-    return context;
+  return context;
 }
 
-export { AuthProvider, useAuth }
+export { AuthProvider, useAuth };
