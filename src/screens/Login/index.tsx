@@ -20,7 +20,6 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import * as Yup from "yup";
 import { useAuth } from "@hooks/auth";
-import { database } from "@databases/index";
 
 interface FormProps {
   email: string;

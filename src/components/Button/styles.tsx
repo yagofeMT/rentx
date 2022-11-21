@@ -1,8 +1,8 @@
-import { RectButton, RectButtonProps } from 'react-native-gesture-handler';
+import { TouchableOpacityProps } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import styled, { css } from 'styled-components/native';
 
-interface ButtonProps extends RectButtonProps {
+interface ButtonProps extends TouchableOpacityProps {
     themeButton: 'progress' | 'sucess' | 'create';
     loading: boolean;
 }
@@ -11,7 +11,7 @@ interface TextProps {
     themeButton: 'progress' | 'sucess' | 'create';
 }
 
-export const Container = styled(RectButton) <ButtonProps>`
+export const Container = styled.TouchableOpacity <ButtonProps>`
     width: 100%;
     height: ${RFValue(56)}px;
 
