@@ -41,7 +41,7 @@ export const ImageWrapper = styled.View`
 
     border-radius: 90px;
 
-    margin-top: ${RFValue(20)}px;
+    margin-top: 10px;
 
     background-color: wheat;
 
@@ -52,7 +52,7 @@ export const ImageWrapper = styled.View`
 `;
 
 export const Image = styled.Image`
-     width: ${RFValue(180)}px;
+    width: ${RFValue(180)}px;
     height: ${RFValue(180)}px;
 
     border-radius: 90px;
@@ -75,8 +75,7 @@ export const CameraImg = styled.TouchableOpacity<TouchableOpacityProps>`
 `;
 
 export const Content = styled.View`
-    padding: ${RFValue(60)}px 24px;
-
+    padding: 80px 24px;
 `;
 
 export const Options = styled.View`
@@ -85,7 +84,7 @@ export const Options = styled.View`
     flex-direction: row;
     justify-content: space-around;
 
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 `;
 
 export const Form = styled.View``;
